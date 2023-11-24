@@ -1,5 +1,3 @@
-import re
-
 board = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 board_size = 3
 
@@ -13,23 +11,26 @@ def draw_board():
     pass
 
 def game_step(index: int, player: str):
-    """ виконуємо хід """
-    pass
+    if (index > 9 or index < 1 or board[index - 1] in ('x', 'o')):
+        return False
+
+    board[index - 1] = player
+    return True
 
 def enter_game_step(current_playr):
-    index = input('step ' + current_playr + ' (to exit - 0): ')
+    index = input('step ' + current_playr  + ': ')
 
     if index == '0':
-        return index
+        return 0
 
     if not index.isdigit():
         print('You can enter only integer number!')
-        return '0'
+        return 0
     elif int(index) < 1 or int(index) > 9:
         print('You can enter only number from 1 to 9!')
-        return '0'
+        return 0
 
-    return index
+    return int(index)
 
 
 def check_win():
@@ -44,12 +45,24 @@ def start_game():
     while (step <= len(board)):
         index = enter_game_step(current_playr)
 
-        if (index == '0'):
+        if (index == 0):
             break
 
-        game_step(index, current_playr)
+        if (game_step(index, current_playr)):
+            print('nice')
 
-        step += 1
+            draw_board()
+
+            if current_playr == 'x':
+                current_playr = 'o'
+            else:
+                current_playr = 'x'
+
+            step += 1
+        else:
+            print('incorect step! repeat')
+
 
 print('start game!')
+print('to exit enter 0')
 start_game()
