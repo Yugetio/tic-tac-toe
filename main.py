@@ -1,6 +1,10 @@
 board = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 board_size = 3
 
+mode = None
+MODE_PVP = '1'
+MODE_PVE = '2'
+
 def draw_board():
     """ малюєм поле """
     print('_' + '_' * 4 * board_size)
@@ -9,15 +13,17 @@ def draw_board():
         print('|', board[i * 3], '|', board[i * 3 + 1], '|', board[i * 3 + 2], '|')
         print('|' + ('_' * 3 + '|') * 3)
 
+
 def game_step(index: int, player: str):
-    if (index > 9 or index < 1 or board[index - 1] in ('x', 'o')):
+    if (index < 1 or index > 9 or board[index - 1] in ('x', 'o')):
         return False
 
     board[index - 1] = player
     return True
 
-def enter_game_step(current_playr):
-    index = input('step ' + current_playr  + ': ')
+
+def enter_game_step(current_playr: str):
+    index = input('step ' + current_playr + ': ')
 
     if index == '0':
         return 0
@@ -31,11 +37,35 @@ def enter_game_step(current_playr):
 
     return int(index)
 
-def change_player(player):
+
+def computer_step(player: str, ai: str):
+    # знайти всі доступні шаги
+    available_steps = [i - 1 for i in board if type(i) == int]
+
+    # пріорітетність шагів
+    win_steps = (4, 0, 2, 6, 8, 1, 3, 5, 7)
+
+    # перебір комбінацій
+    for char in (ai, player):
+        for pos in available_steps:
+            board_ai = board[:]
+            board_ai[pos] = char
+
+            if check_win(board_ai):
+                return pos
+
+    for pos in win_steps:
+        if pos in available_steps:
+            return pos
+
+    return -1
+
+
+def next_player(player: str):
     return 'o' if player == 'x' else 'x'
 
 
-def check_win():
+def check_win(board):
     win_combination = (
         (0, 1, 2), (3, 4, 5), (6, 7, 8),
         (0, 3, 6), (1, 4, 7), (2, 5, 8),
@@ -48,8 +78,17 @@ def check_win():
 
     return False
 
-def start_game():
+
+def choose_mode():
+    global mode
+
+    while mode not in (MODE_PVP, MODE_PVE):
+        mode = input('Choose mode:\n 1 - PvP\n 2 - PvE\nEnter mode: ')
+
+
+def start_game(mode):
     current_playr = 'x'
+    ai_player = 'o'
     step = 1
     draw_board()
 
@@ -64,12 +103,25 @@ def start_game():
 
             draw_board()
 
-            if check_win() == True:
+            if check_win(board) == True:
                 break
 
-            current_playr = change_player(current_playr)
+            current_playr = next_player(current_playr)
 
             step += 1
+
+            if mode == MODE_PVE and step <= len(board):
+                ai_step = computer_step('x', 'o')
+                if ai_step != -1:
+                    board[ai_step] = ai_player
+
+                    draw_board()
+                    if check_win(board) == True:
+                        break
+
+                    current_playr = next_player(current_playr)
+                    step += 1
+
         else:
             print('incorect step! repeat')
 
@@ -81,4 +133,6 @@ def start_game():
 
 print('start game!')
 print('to exit enter 0')
-start_game()
+
+choose_mode()
+start_game(mode)
