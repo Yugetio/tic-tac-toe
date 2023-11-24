@@ -32,10 +32,8 @@ def enter_game_step(current_playr):
     return int(index)
 
 def change_player(player):
-    if player == 'x':
-        return 'o'
-    else:
-        return 'x'
+    return 'o' if player == 'x' else 'x'
+
 
 def check_win():
     win_combination = (
@@ -59,7 +57,7 @@ def start_game():
         index = enter_game_step(current_playr)
 
         if (index == 0):
-            break
+            return 0
 
         if (game_step(index, current_playr)):
             print('nice')
@@ -75,7 +73,10 @@ def start_game():
         else:
             print('incorect step! repeat')
 
-    print('Winner ' + current_playr)
+    if step == 10:
+        print('Draw')
+    else:
+        print('Winner ' + current_playr)
 
 
 print('start game!')
