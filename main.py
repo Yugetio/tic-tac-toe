@@ -8,7 +8,6 @@ def draw_board():
         print('|' + (' ' * 3 + '|') * 3)
         print('|', board[i * 3], '|', board[i * 3 + 1], '|', board[i * 3 + 2], '|')
         print('|' + ('_' * 3 + '|') * 3)
-    pass
 
 def game_step(index: int, player: str):
     if (index > 9 or index < 1 or board[index - 1] in ('x', 'o')):
@@ -32,10 +31,24 @@ def enter_game_step(current_playr):
 
     return int(index)
 
+def change_player(player):
+    if player == 'x':
+        return 'o'
+    else:
+        return 'x'
 
 def check_win():
+    win_combination = (
+        (0, 1, 2), (3, 4, 5), (6, 7, 8),
+        (0, 3, 6), (1, 4, 7), (2, 5, 8),
+        (0, 4, 8), (2, 4, 6)
+    )
+
+    for pos in win_combination:
+        if (board[pos[0]] == board[pos[1]] and board[pos[1]] == board[pos[2]]):
+            return True
+
     return False
-    pass
 
 def start_game():
     current_playr = 'x'
@@ -53,14 +66,16 @@ def start_game():
 
             draw_board()
 
-            if current_playr == 'x':
-                current_playr = 'o'
-            else:
-                current_playr = 'x'
+            if check_win() == True:
+                break
+
+            current_playr = change_player(current_playr)
 
             step += 1
         else:
             print('incorect step! repeat')
+
+    print('Winner ' + current_playr)
 
 
 print('start game!')
